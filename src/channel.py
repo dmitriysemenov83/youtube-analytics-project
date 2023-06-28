@@ -16,9 +16,33 @@ class Channel:
     """Класс для ютуб-канала"""
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.channel_id = channel_id
+        self.__channel_id = channel_id
+        channel = youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
+        self.title = channel['items'][0]['snippet']['title']
+        self.description = channel['items'][0]['snippet']['description']
+        self.url = f"https://www.youtube.com/channel/{self.__channel_id}"
+        self.subscriber_count = channel['items'][0]['statistics']['subscriberCount']
+        self.video_count = channel['items'][0]['statistics']['videoCount']
+        self.view_count = channel['items'][0]['statistics']['viewCount']
 
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
-        channel = youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
+    #    print(f"id канала: {self.__channel_id}")
+    #    print(f"Название канала: {self.title}")
+    #    print(f"Описание канала: {self.description}")
+    #    print(f"Ссылка на канал: {self.url}")
+    #    print(f"Количество подписчиков: {self.subscriber_count}")
+    #    print(f"Количество видео: {self.video_count}")
+    #    print(f"Общее количество просмотров: {self.view_count}")
+    #def print_info(self) -> None:
+        channel = youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
         printj(channel)
+
+
+    @classmethod
+    def get_service(cls):
+        return build('youtube', 'v3', developerKey=APY_KEY)
+
+    def to_json(self, filename: str) -> None:
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(self.__dict__, f, indent=2, ensure_ascii=False)
