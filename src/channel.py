@@ -14,9 +14,10 @@ def printj(dict_to_print: dict) -> None:
 
 class Channel:
     """Класс для ютуб-канала"""
-    def __init__(self, channel_id: str) -> None:
+    def __init__(self, channel_id: str):
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.__channel_id = channel_id
+        youtube = self.get_service()
         channel = youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
         self.title = channel['items'][0]['snippet']['title']
         self.description = channel['items'][0]['snippet']['description']
@@ -24,6 +25,30 @@ class Channel:
         self.subscriber_count = channel['items'][0]['statistics']['subscriberCount']
         self.video_count = channel['items'][0]['statistics']['videoCount']
         self.view_count = channel['items'][0]['statistics']['viewCount']
+
+    def __str__(self):
+        return f'{self.title} ({self.url})'
+
+    def __add__(self, other):
+        return int(self.subscriber_count) + int(other.subscriber_count)
+
+    def __sub__(self, other):
+        return int(self.subscriber_count) - int(other.subscriber_count)
+
+    def __gt__(self, other):
+        return int(self.subscriber_count) > int(other.subscriber_count)
+
+    def __ge__(self, other):
+        return int(self.subscriber_count) >= int(other.subscriber_count)
+
+    def __lt__(self, other):
+        return int(self.subscriber_count) < int(other.subscriber_count)
+
+    def __le__(self, other):
+        return int(self.subscriber_count) <= int(other.subscriber_count)
+
+    def __eq__(self, other):
+        return int(self.subscriber_count) == int(other.subscriber_count)
 
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
@@ -34,7 +59,6 @@ class Channel:
     #    print(f"Количество подписчиков: {self.subscriber_count}")
     #    print(f"Количество видео: {self.video_count}")
     #    print(f"Общее количество просмотров: {self.view_count}")
-    #def print_info(self) -> None:
         channel = youtube.channels().list(id=self.__channel_id, part='snippet,statistics').execute()
         printj(channel)
 
